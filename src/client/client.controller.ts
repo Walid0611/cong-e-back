@@ -75,44 +75,46 @@ export class ClientController {
 
   @Put(':id')
   async updateClient(@Res() res: any, @Param('id') id: number, @Body() clientData: UpdateClientDto) {
-    try {
-      // Now, you can use 'id' as a number
-      const updatedClient = await this.clientService.update(id, clientData);
-      if (!updatedClient) {
-        return res.status(HttpStatus.NOT_FOUND).json({
-          success: false,
-          message: 'Client not found',
-        });
-      }
+    const updatedClient = await this.clientService.update(id, clientData);
+
+    if (updatedClient) {
       return res.status(HttpStatus.OK).json({
         success: true,
         message: 'Client has been updated successfully',
         client: updatedClient,
       });
-    } catch (error) {
-      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+    } else {
+      return res.status(HttpStatus.NOT_FOUND).json({
         success: false,
-        message: 'An error occurred while updating the client',
-        error: error.message,
+        message: 'Client not found',
       });
     }
   }
 
   @Delete(':id')
   async deleteClient(@Res() res: any, @Param('id') id: number) {
-    console.log(`Received delete request for client with ID: ${id}`);
     try {
+      // Delete the client with the specified ID
       const deletedClient = await this.clientService.remove(id);
-      return res.status(HttpStatus.OK).json({
-        success: true,
-        message: 'Client has been deleted successfully',
-        client: deletedClient,
-      });
+
+      if (deletedClient) {
+        return res.status(HttpStatus.OK).json({
+          success: true,
+          message: 'Client has been deleted successfully',
+          client: deletedClient,
+        });
+      } else {
+        return res.status(HttpStatus.NOT_FOUND).json({
+          success: false,
+          message: 'Client not found',
+        });
+      }
     } catch (error) {
       console.error(`Error deleting client: ${error}`);
-      return res.status(HttpStatus.NOT_FOUND).json({
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: 'Client not found',
+        message: 'An error occurred while deleting the client',
+        error: error.message,
       });
     }
   }}

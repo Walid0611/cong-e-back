@@ -3,5 +3,7 @@ export class CreateClientDto {
     endDate: Date;
     numberOfDays: number;
     reason: string;
+    approve:string;
+    
     
 }

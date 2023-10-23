@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './users/users.module';
 import { ClientModule } from './client/client.module';
 // import { CamundaModule } from './camunda/camunda.module';
+import { EmailModule } from './email/email.module';
 
 
 
@@ -25,6 +26,7 @@ import { ClientModule } from './client/client.module';
     AuthModule,
     UsersModule,
     ClientModule,
+    EmailModule,
     // CamundaModule, 
     
   ],
