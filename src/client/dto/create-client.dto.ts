@@ -4,6 +4,7 @@ export class CreateClientDto {
     numberOfDays: number;
     reason: string;
     approve:string;
+    file:string
     
     
 }

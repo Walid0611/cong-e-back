@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
+// import { UpdateFileUploadDto } from './../file-upload/dto/update-file-upload.dto';
+import { uploadFile } from 'src/uploadFile';
 
 @Schema({ timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } })
 export class Client {
@@ -20,5 +22,8 @@ export class Client {
 
     @Prop()
     approve: string;
+
+    @Prop()
+    file: string
 }
 export const ClientSchema = SchemaFactory.createForClass(Client);

@@ -1,17 +1,35 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, Res, HttpStatus, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, Res, HttpStatus, NotFoundException, UploadedFile, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator, UseInterceptors } from '@nestjs/common';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
 import { ClientService } from './client.service';
 import { Client } from 'src/schemas/client.schema';
 import { Types } from 'mongoose';
+import { uploadFile } from 'src/uploadFile';
+import { FileInterceptor } from '@nestjs/platform-express';
+
 
 @Controller('clients')
 export class ClientController {
   constructor(private clientService: ClientService) { }
 
   @Post('')
-  async createUser(@Res() res: any, @Body() client: CreateClientDto) {
+  @UseInterceptors(FileInterceptor('file'))
+  async createUser(@Res() res: any, @Body() client: CreateClientDto, @UploadedFile(
+    new ParseFilePipe({
+      validators: [
+        new MaxFileSizeValidator({
+          maxSize: 1e6,
+        }),
+        new FileTypeValidator({
+          fileType: 'image/*',
+        }),
+      ],
+      fileIsRequired: false,
+    }),
+  )
+  file?: Express.Multer.File,) {
     try {
+      client.file = await uploadFile(file, 'client')
       const clientPost = await this.clientService.create(client);
       return res.status(HttpStatus.OK).json({
         success: true,
@@ -27,7 +45,7 @@ export class ClientController {
       }
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: 'An error occurred while creating the client',
+        message: 'An error occurred while creating the client ',
         error: error.message,
       });
     }
@@ -94,7 +112,6 @@ export class ClientController {
   @Delete(':id')
   async deleteClient(@Res() res: any, @Param('id') id: number) {
     try {
-      // Delete the client with the specified ID
       const deletedClient = await this.clientService.remove(id);
 
       if (deletedClient) {
@@ -114,7 +131,8 @@ export class ClientController {
       return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
         success: false,
         message: 'An error occurred while deleting the client',
-        error: error.message,
+        error: error.message, 
       });
     }
   }}
+
